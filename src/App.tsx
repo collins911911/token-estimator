@@ -1,13 +1,23 @@
+import React, { Suspense } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
+import Preloader from './components/Preloader'
+import PageLoader from './components/PageLoader'
 
-function App() {
+function App(): React.ReactElement {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
-    </Router>
+    <>
+      {/* Landing preloader — shows once on first load */}
+      <Preloader />
+
+      <Router>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+          </Routes>
+        </Suspense>
+      </Router>
+    </>
   )
 }
 
