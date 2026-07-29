@@ -3,14 +3,17 @@ import type { CalculatorState, TokenResult, CostResult } from '../types/models'
 import { AI_MODELS, DEFAULT_MODEL_ID } from '../constants/models'
 import { estimateTokens, estimateOutputTokens } from '../utils/tokenizer'
 import { calculateCost } from '../utils/calculator'
+import { decodeStateFromURL } from '../utils/share'
 
 const DEBOUNCE_MS = 300
 
 export function useTokenCalculator() {
+  const urlState = decodeStateFromURL()
+
   const [state, setState] = useState<CalculatorState>({
-    prompt: '',
-    selectedModelId: DEFAULT_MODEL_ID,
-    requestsPerDay: 1000,
+    prompt: urlState?.prompt ?? '',
+    selectedModelId: urlState?.modelId ?? DEFAULT_MODEL_ID,
+    requestsPerDay: urlState?.requestsPerDay ?? 1000,
     tokenResult: null,
     costResult: null,
     isCalculating: false,
@@ -18,9 +21,18 @@ export function useTokenCalculator() {
 
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const calculate = useCallback((prompt: string, modelId: string, requestsPerDay: number) => {
+  const calculate = useCallback((
+    prompt: string,
+    modelId: string,
+    requestsPerDay: number
+  ) => {
     if (!prompt.trim()) {
-      setState(prev => ({ ...prev, tokenResult: null, costResult: null, isCalculating: false }))
+      setState(prev => ({
+        ...prev,
+        tokenResult: null,
+        costResult: null,
+        isCalculating: false,
+      }))
       return
     }
 
@@ -37,7 +49,12 @@ export function useTokenCalculator() {
       characters: prompt.length,
     }
 
-    const costResult: CostResult = calculateCost(inputTokens, outputTokens, model, requestsPerDay)
+    const costResult: CostResult = calculateCost(
+      inputTokens,
+      outputTokens,
+      model,
+      requestsPerDay
+    )
 
     setState(prev => ({
       ...prev,
@@ -47,7 +64,6 @@ export function useTokenCalculator() {
     }))
   }, [])
 
-  // Debounced calculation triggered on prompt change
   useEffect(() => {
     if (debounceTimer.current) clearTimeout(debounceTimer.current)
 
@@ -67,6 +83,12 @@ export function useTokenCalculator() {
     }
   }, [state.prompt, state.selectedModelId, state.requestsPerDay, calculate])
 
+  useEffect(() => {
+    if (urlState?.prompt) {
+      calculate(urlState.prompt, urlState.modelId, urlState.requestsPerDay)
+    }
+  }, [])
+
   const setPrompt = useCallback((prompt: string) => {
     setState(prev => ({ ...prev, prompt }))
   }, [])
@@ -80,7 +102,13 @@ export function useTokenCalculator() {
   }, [])
 
   const clearPrompt = useCallback(() => {
-    setState(prev => ({ ...prev, prompt: '', tokenResult: null, costResult: null }))
+    setState(prev => ({
+      ...prev,
+      prompt: '',
+      tokenResult: null,
+      costResult: null,
+    }))
+    window.history.replaceState({}, '', window.location.pathname)
   }, [])
 
   const selectedModel = AI_MODELS.find(m => m.id === state.selectedModelId) ?? AI_MODELS[0]
