@@ -19,18 +19,18 @@ export default {
           800: "#1e40af",
           900: "#1e3a8a",
         },
-        glass: {
-          white: "rgba(255, 255, 255, 0.08)",
-          border: "rgba(255, 255, 255, 0.15)",
-          hover: "rgba(255, 255, 255, 0.12)",
-        },
+      glass: {
+  white: "rgba(255, 255, 255, 0.85)",
+  border: "rgba(59, 130, 246, 0.2)",
+  hover: "rgba(59, 130, 246, 0.08)",
+},
         success: "#22c55e",
         danger:  "#ef4444",
-        bg: {
-          base:    "#0f172a",
-          surface: "#1e293b",
-          card:    "#1a2744",
-        },
+       bg: {
+  base:    "#f0f7ff",
+  surface: "#e8f3ff",
+  card:    "#ddeeff",
+},
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
