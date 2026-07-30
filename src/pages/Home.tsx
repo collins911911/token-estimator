@@ -7,6 +7,10 @@ import FAQ from '../components/FAQ'
 import Footer from '../components/Footer'
 import SEO from '../components/SEO'
 import JsonLd from '../components/JsonLd'
+import {
+  AdBannerMiddle,
+  AdBannerBottom,
+} from '../components/AdBanner'
 
 function Home(): React.ReactElement {
   return (
@@ -18,13 +22,21 @@ function Home(): React.ReactElement {
         canonical="https://tokenlens.dev"
       />
       <JsonLd />
+
       <div className="min-h-screen bg-bg-base">
         <Navbar />
         <main>
           <Hero />
           <ToolCard />
+
+          {/* Ad between tool and comparison — high visibility, non-intrusive */}
+          <AdBannerMiddle />
+
           <ComparisonTable />
           <FAQ />
+
+          {/* Ad above footer — last touchpoint before leaving */}
+          <AdBannerBottom />
         </main>
         <Footer />
       </div>
