@@ -1,11 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Load only weights we actually use — faster than loading all weights */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  * {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -15,61 +18,77 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Prevent layout shift from scrollbar appearing */
+    overflow-y: scroll;
   }
 
- body {
-  background-color: #f0f7ff;
-  color: #0a0f1e;
-  font-family: "Inter", system-ui, sans-serif;
-  min-height: 100vh;
-  font-weight: 500;
-}
+  body {
+    background-color: #f0f7ff;
+    color: #0a0f1e;
+    font-family: "Inter", system-ui, sans-serif;
+    font-weight: 500;
+    min-height: 100vh;
+    /* Prevent invisible text during font load */
+    font-display: swap;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #0a0f1e;
+    font-weight: 700;
+  }
+
+  p {
+    color: #1e293b;
+    font-weight: 450;
+  }
+
+  a {
+    font-weight: 500;
+  }
+
+  /* Only show focus rings for keyboard users */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
   }
-
- ::-webkit-scrollbar-track {
-  background: #e8f3ff;
-}
-
+  ::-webkit-scrollbar-track {
+    background: #e8f3ff;
+  }
   ::-webkit-scrollbar-thumb {
     background: #3b82f6;
     border-radius: 3px;
   }
-
-  h1, h2, h3, h4, h5, h6 {
-  color: #0a0f1e;
-  font-weight: 700;
-}
-
-p {
-  color: #1e293b;
-  font-weight: 450;
-}
-
-a {
-  font-weight: 500;
-}
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+  }
 }
 
 @layer components {
   .glass-card {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.2);
     border-radius: 1rem;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 24px rgba(59, 130, 246, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 
   .glass-card-hover {
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .glass-card-hover:hover {
-    background: rgba(255, 255, 255, 0.12);
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
     transform: translateY(-2px);
   }
 
@@ -83,6 +102,7 @@ a {
     transition: all 0.2s ease;
     border: none;
     cursor: pointer;
+    display: inline-block;
   }
 
   .btn-primary:hover {
@@ -92,9 +112,32 @@ a {
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+}
+
+@layer utilities {
+  /* Hardware accelerated animations */
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out both;
+    will-change: opacity;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out both;
+    will-change: opacity, transform;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }

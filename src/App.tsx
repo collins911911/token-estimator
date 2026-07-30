@@ -1,15 +1,15 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Home from './pages/Home'
 import Preloader from './components/Preloader'
 import PageLoader from './components/PageLoader'
+
+// Lazy load Home page — only loads when needed
+const Home = lazy(() => import('./pages/Home'))
 
 function App(): React.ReactElement {
   return (
     <>
-      {/* Landing preloader — shows once on first load */}
       <Preloader />
-
       <Router>
         <Suspense fallback={<PageLoader />}>
           <Routes>
