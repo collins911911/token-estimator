@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { useTokenCalculator } from '../hooks/useTokenCalculator'
 import { AI_MODELS, PROVIDERS } from '../constants/models'
+import { AFFILIATE_LINKS } from '../constants/affiliates'
 import { formatCost } from '../utils/tokenizer'
 import { calculateCost, getCheapestModel, getMostExpensiveModel } from '../utils/calculator'
 import { encodeStateToURL, copyToClipboard } from '../utils/share'
@@ -19,7 +20,6 @@ const CONTEXT_TO_NUM: Record<string, number> = {
 
 function ComparisonTable(): React.ReactElement {
   const { state, selectedModel } = useTokenCalculator()
-
   const [sortKey, setSortKey] = useState<SortKey>('total')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
   const [activeProvider, setActiveProvider] = useState<string>('All')
@@ -39,34 +39,21 @@ function ComparisonTable(): React.ReactElement {
     models.sort((a, b) => {
       let valA = 0
       let valB = 0
-
-      if (sortKey === 'input') {
-        valA = a.pricing.inputPricePer1M
-        valB = b.pricing.inputPricePer1M
-      } else if (sortKey === 'output') {
-        valA = a.pricing.outputPricePer1M
-        valB = b.pricing.outputPricePer1M
-      } else if (sortKey === 'context') {
-        valA = CONTEXT_TO_NUM[a.contextWindow] ?? 0
-        valB = CONTEXT_TO_NUM[b.contextWindow] ?? 0
-      } else {
+      if (sortKey === 'input') { valA = a.pricing.inputPricePer1M; valB = b.pricing.inputPricePer1M }
+      else if (sortKey === 'output') { valA = a.pricing.outputPricePer1M; valB = b.pricing.outputPricePer1M }
+      else if (sortKey === 'context') { valA = CONTEXT_TO_NUM[a.contextWindow] ?? 0; valB = CONTEXT_TO_NUM[b.contextWindow] ?? 0 }
+      else {
         valA = calculateCost(inputTokens, outputTokens, a, 1).singleRequestCost
         valB = calculateCost(inputTokens, outputTokens, b, 1).singleRequestCost
       }
-
       return sortDir === 'asc' ? valA - valB : valB - valA
     })
-
     return models
   }, [sortKey, sortDir, activeProvider, inputTokens, outputTokens])
 
   function handleSort(key: SortKey) {
-    if (key === sortKey) {
-      setSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'))
-    } else {
-      setSortKey(key)
-      setSortDir('asc')
-    }
+    if (key === sortKey) setSortDir(prev => prev === 'asc' ? 'desc' : 'asc')
+    else { setSortKey(key); setSortDir('asc') }
   }
 
   async function handleShare() {
@@ -76,10 +63,7 @@ function ComparisonTable(): React.ReactElement {
       requestsPerDay: state.requestsPerDay,
     })
     const success = await copyToClipboard(url)
-    if (success) {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2500)
-    }
+    if (success) { setCopied(true); setTimeout(() => setCopied(false), 2500) }
   }
 
   function SortIcon({ col }: { col: SortKey }) {
@@ -98,10 +82,11 @@ function ComparisonTable(): React.ReactElement {
           <p className="text-slate-600 max-w-xl mx-auto font-medium">
             {state.tokenResult
               ? `Based on your prompt — ${inputTokens} input + ${outputTokens} output tokens`
-              : 'Based on sample 500 input + 150 output tokens. Paste a prompt above for your exact costs.'}
+              : 'Based on sample 500 input + 150 output tokens. Paste a prompt above for exact costs.'}
           </p>
         </div>
 
+        {/* Controls */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
           <div className="flex flex-wrap gap-2">
             {['All', ...PROVIDERS].map(provider => (
@@ -118,27 +103,19 @@ function ComparisonTable(): React.ReactElement {
               </button>
             ))}
           </div>
-
           <button
             onClick={handleShare}
             className={`flex items-center gap-2 text-xs px-4 py-2 rounded-full font-semibold transition-all duration-200 ${
               copied
                 ? 'bg-success text-white'
-                : 'bg-white border border-blue-200 text-slate-600 hover:border-primary-400 hover:text-primary-600'
+                : 'bg-white border border-blue-200 text-slate-600 hover:border-primary-400'
             }`}
           >
-            {copied ? (
-              <>✅ Link Copied!</>
-            ) : (
+            {copied ? '✅ Link Copied!' : (
               <>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path
-                    d="M9 1H13V5M13 1L6 8M5 3H2C1.45 3 1 3.45 1 4V12C1 12.55 1.45 13 2 13H10C10.55 13 11 12.55 11 12V9"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                  <path d="M9 1H13V5M13 1L6 8M5 3H2C1.45 3 1 3.45 1 4V12C1 12.55 1.45 13 2 13H10C10.55 13 11 12.55 11 12V9"
+                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 Share Results
               </>
@@ -146,8 +123,10 @@ function ComparisonTable(): React.ReactElement {
           </button>
         </div>
 
+        {/* Table */}
         <div className="glass-card overflow-hidden">
-          <div className="grid grid-cols-6 gap-2 px-6 py-4 border-b border-blue-100 bg-blue-50/60">
+          {/* Header */}
+          <div className="grid grid-cols-7 gap-2 px-6 py-4 border-b border-blue-100 bg-blue-50/60">
             {[
               { label: 'Model', key: null },
               { label: 'Provider', key: null },
@@ -155,6 +134,7 @@ function ComparisonTable(): React.ReactElement {
               { label: 'Output /1M', key: 'output' as SortKey },
               { label: 'Context', key: 'context' as SortKey },
               { label: 'Your Cost', key: 'total' as SortKey },
+              { label: 'Get Started', key: null },
             ].map(col => (
               <div
                 key={col.label}
@@ -169,6 +149,7 @@ function ComparisonTable(): React.ReactElement {
             ))}
           </div>
 
+          {/* Rows */}
           {filteredAndSorted.length === 0 ? (
             <div className="px-6 py-10 text-center text-slate-400 font-medium">
               No models found for this provider.
@@ -179,38 +160,60 @@ function ComparisonTable(): React.ReactElement {
               const isCheapest = row.id === cheapestId
               const isExpensive = row.id === expensiveId
               const isSelected = row.id === selectedModel.id
+              const affiliate = AFFILIATE_LINKS[row.provider]
 
               return (
                 <div
                   key={row.id}
-                  className={`grid grid-cols-6 gap-2 px-6 py-4 border-b border-blue-50 last:border-0 transition-all duration-200 hover:bg-blue-50/40
+                  className={`grid grid-cols-7 gap-2 px-6 py-4 border-b border-blue-50 last:border-0 transition-all duration-200 hover:bg-blue-50/40
                     ${isCheapest ? 'border-l-4 border-l-success bg-green-50/30' : ''}
                     ${isExpensive ? 'border-l-4 border-l-danger bg-red-50/20' : ''}
                     ${isSelected && !isCheapest && !isExpensive ? 'border-l-4 border-l-primary-400 bg-blue-50/30' : ''}
                   `}
                 >
+                  {/* Model Name */}
                   <div className="flex flex-col gap-1">
                     <span className="text-sm font-bold text-slate-800 leading-tight">{row.name}</span>
                     <div className="flex flex-wrap gap-1">
-                      {isCheapest && (
-                        <span className="text-xs bg-success/20 text-success px-1.5 py-0.5 rounded-full font-bold">💚 Best</span>
-                      )}
-                      {isExpensive && (
-                        <span className="text-xs bg-danger/20 text-danger px-1.5 py-0.5 rounded-full font-bold">🔴 Priciest</span>
-                      )}
-                      {isSelected && (
-                        <span className="text-xs bg-primary-100 text-primary-600 px-1.5 py-0.5 rounded-full font-bold">⚡ Selected</span>
-                      )}
+                      {isCheapest && <span className="text-xs bg-success/20 text-success px-1.5 py-0.5 rounded-full font-bold">💚 Best</span>}
+                      {isExpensive && <span className="text-xs bg-danger/20 text-danger px-1.5 py-0.5 rounded-full font-bold">🔴 Priciest</span>}
+                      {isSelected && <span className="text-xs bg-primary-100 text-primary-600 px-1.5 py-0.5 rounded-full font-bold">⚡ Selected</span>}
                     </div>
                   </div>
+
+                  {/* Provider */}
                   <div className="text-sm text-slate-500 font-medium flex items-center">{row.provider}</div>
+
+                  {/* Input */}
                   <div className="text-sm font-mono font-bold text-success flex items-center">${row.pricing.inputPricePer1M}</div>
+
+                  {/* Output */}
                   <div className="text-sm font-mono font-bold text-danger flex items-center">${row.pricing.outputPricePer1M}</div>
+
+                  {/* Context */}
                   <div className="text-sm text-slate-500 font-medium flex items-center">{row.contextWindow}</div>
+
+                  {/* Cost */}
                   <div className={`text-sm font-mono font-bold flex items-center ${
                     isCheapest ? 'text-success' : isExpensive ? 'text-danger' : 'text-primary-600'
                   }`}>
                     {formatCost(sampleCost)}
+                  </div>
+
+                  {/* Affiliate Link */}
+                  <div className="flex items-center">
+                    {affiliate ? (
+                      <a
+                        href={affiliate.url}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        className="text-xs px-3 py-1.5 rounded-full font-semibold bg-primary-50 text-primary-600 border border-primary-200 hover:bg-primary-500 hover:text-white transition-all duration-200 whitespace-nowrap"
+                      >
+                        {affiliate.label} →
+                      </a>
+                    ) : (
+                      <span className="text-xs text-slate-300">—</span>
+                    )}
                   </div>
                 </div>
               )
@@ -218,6 +221,7 @@ function ComparisonTable(): React.ReactElement {
           )}
         </div>
 
+        {/* Legend */}
         <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
           <div className="flex flex-wrap items-center gap-4">
             <span className="flex items-center gap-1.5 text-xs text-slate-500">
@@ -231,7 +235,7 @@ function ComparisonTable(): React.ReactElement {
             </span>
           </div>
           <p className="text-xs text-slate-400 font-medium">
-            * Click column headers to sort. Verify prices on provider pages.
+            * Click headers to sort. Verify prices on provider pages.
           </p>
         </div>
       </div>

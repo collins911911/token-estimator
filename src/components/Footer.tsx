@@ -1,4 +1,6 @@
-function TokenLensLogoSmall() {
+import React from 'react'
+
+function TokenLensLogoSmall(): React.ReactElement {
   return (
     <div className="flex items-center gap-2">
       <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
@@ -16,28 +18,36 @@ function TokenLensLogoSmall() {
   )
 }
 
-function Footer() {
+function Footer(): React.ReactElement {
   return (
-    <footer className="border-t border-glass-border mt-8">
+    <footer className="border-t border-blue-100 mt-8">
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+
           {/* Brand */}
           <div>
             <TokenLensLogoSmall />
             <p className="text-slate-500 text-sm mt-3 leading-relaxed max-w-xs">
               Free AI token counter and API cost estimator for developers, marketers,
-              and freelancers. No login required.
+              and freelancers. No login required. Ever.
             </p>
           </div>
 
-          {/* Links */}
+          {/* Tool Links */}
           <div>
-            <h4 className="text-sm font-semibold text-slate-300 mb-3">Tool</h4>
+            <h4 className="text-sm font-bold text-slate-700 mb-3">Tool</h4>
             <ul className="space-y-2">
-              {['Token Calculator', 'Cost Comparison', 'FAQ'].map(link => (
-                <li key={link}>
-                  <a href="#tool" className="text-slate-500 hover:text-primary-400 text-sm transition-colors">
-                    {link}
+              {[
+                { label: 'Token Calculator', href: '#tool' },
+                { label: 'Cost Comparison', href: '#compare' },
+                { label: 'FAQ', href: '#faq' },
+              ].map(link => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    className="text-slate-500 hover:text-primary-500 text-sm transition-colors font-medium"
+                  >
+                    {link.label}
                   </a>
                 </li>
               ))}
@@ -46,26 +56,58 @@ function Footer() {
 
           {/* Providers */}
           <div>
-            <h4 className="text-sm font-semibold text-slate-300 mb-3">Supported Providers</h4>
+            <h4 className="text-sm font-bold text-slate-700 mb-3">Supported Providers</h4>
             <ul className="space-y-2">
-              {['OpenAI', 'Anthropic', 'Google Gemini', 'Mistral AI'].map(p => (
-                <li key={p} className="text-slate-500 text-sm">{p}</li>
+              {[
+                { label: 'OpenAI (GPT-4o)', href: 'https://platform.openai.com/signup' },
+                { label: 'Anthropic (Claude)', href: 'https://console.anthropic.com/login' },
+                { label: 'Google (Gemini)', href: 'https://aistudio.google.com/app/apikey' },
+                { label: 'Mistral AI', href: 'https://console.mistral.ai/' },
+                { label: 'Meta Llama (Groq)', href: 'https://console.groq.com/login' },
+              ].map(p => (
+                <li key={p.label}>
+                  <a
+                    href={p.href}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="text-slate-500 hover:text-primary-500 text-sm transition-colors font-medium"
+                  >
+                    {p.label} →
+                  </a>
+                </li>
               ))}
             </ul>
           </div>
         </div>
 
+        {/* Affiliate Disclosure — legally required */}
+        <div
+          id="disclosure"
+          className="glass-card p-5 mb-6 border-l-4 border-primary-300"
+        >
+          <h5 className="text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide">
+            Affiliate Disclosure
+          </h5>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            TokenLens participates in referral programs with AI providers. Some links on this
+            page are affiliate or referral links, marked with "→". If you sign up or make a
+            purchase through these links, TokenLens may earn a commission at no additional cost
+            to you. We only link to services we genuinely recommend and use. This disclosure is
+            provided in compliance with the FTC guidelines on endorsements and testimonials.
+          </p>
+        </div>
+
         {/* Bottom Bar */}
-        <div className="border-t border-glass-border pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-slate-600 text-xs">
+        <div className="border-t border-blue-100 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-slate-500 text-xs font-medium">
             © {new Date().getFullYear()} TokenLens. Free forever. Built for developers.
           </p>
           <div className="flex items-center gap-4">
-            <a href="#" className="text-slate-600 hover:text-primary-400 text-xs transition-colors">
-              Privacy Policy
-            </a>
-            <a href="#" className="text-slate-600 hover:text-primary-400 text-xs transition-colors">
+            <a href="#disclosure" className="text-slate-400 hover:text-primary-500 text-xs transition-colors">
               Affiliate Disclosure
+            </a>
+            <a href="#" className="text-slate-400 hover:text-primary-500 text-xs transition-colors">
+              Privacy Policy
             </a>
           </div>
         </div>
